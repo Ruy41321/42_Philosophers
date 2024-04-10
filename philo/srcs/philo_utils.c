@@ -6,7 +6,7 @@
 /*   By: lpennisi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 13:54:42 by lpennisi          #+#    #+#             */
-/*   Updated: 2024/03/09 17:37:57 by lpennisi         ###   ########.fr       */
+/*   Updated: 2024/04/10 14:08:09 by lpennisi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	*philo_routine(void *arg)
 		if (is_over(philo->table))
 			break ;
 		eat(philo);
-		if (philo_is_full(philo))
+		if (philo_is_full(philo) || is_over(philo->table))
 			break ;
 		philo_sleep(philo);
 	}
@@ -60,6 +60,5 @@ void	start_philos(t_table *table)
 	{
 		pthread_create(&(table->philos[i].tid), NULL, \
 					&philo_routine, (void *)&table->philos[i]);
-		pthread_detach(table->philos[i].tid);
 	}
 }
