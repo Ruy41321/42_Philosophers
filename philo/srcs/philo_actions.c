@@ -25,19 +25,18 @@ void	wait_death(t_philo *philo)
 	}
 }
 
-int	take_forks(t_philo *philo)
+int	take_second_fork(t_philo *philo)
 {
 	if (!is_over(philo->table))
 	{
-		if ((philo->id % 2))
-			pthread_mutex_lock(&philo->fork);
-		else if (philo->next_p)
-			pthread_mutex_lock(&philo->next_p->fork);
-	}
-	stamp("has taken a fork\n", philo);
-	if (!is_over(philo->table))
-	{
-		if (!(philo->id % 2))
+		if (philo->table->num_of_philo % 2 != 0)
+		{
+			if (philo->next_p)
+				pthread_mutex_lock(&philo->next_p->fork);
+			else
+				return (wait_death(philo), 1);
+		}
+		else if (!(philo->id % 2))
 			pthread_mutex_lock(&philo->fork);
 		else if (philo->next_p)
 			pthread_mutex_lock(&philo->next_p->fork);
@@ -45,7 +44,24 @@ int	take_forks(t_philo *philo)
 			return (wait_death(philo), 1);
 		stamp("has taken a fork\n", philo);
 	}
-	else
+	return (0);
+}
+
+int	take_forks(t_philo *philo)
+{
+	if (!is_over(philo->table))
+	{
+		if (philo->table->num_of_philo % 2 != 0)
+			pthread_mutex_lock(&philo->fork);
+		else if ((philo->id % 2))
+			pthread_mutex_lock(&philo->fork);
+		else if (philo->next_p)
+			pthread_mutex_lock(&philo->next_p->fork);
+	}
+	stamp("has taken a fork\n", philo);
+	if (take_second_fork(philo))
+		return (1);
+	if (is_over(philo->table))
 	{
 		pthread_mutex_unlock(&philo->fork);
 		pthread_mutex_unlock(&philo->next_p->fork);

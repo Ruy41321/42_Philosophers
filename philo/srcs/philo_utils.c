@@ -21,19 +21,6 @@ void	ft_sleep(int time, t_table *table)
 		usleep(50);
 }
 
-int	get_time(void)
-{
-	static struct timeval	t;
-
-	gettimeofday(&t, NULL);
-	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
-}
-
-int	get_program_time(t_table *table)
-{
-	return (get_time() - table->creation_time);
-}
-
 void	*philo_routine(void *arg)
 {
 	t_philo	*philo;
@@ -49,7 +36,6 @@ void	*philo_routine(void *arg)
 		pthread_mutex_lock(&philo->table->sem);
 		pthread_mutex_unlock(&philo->table->sem);
 	}
-	
 	while (1)
 	{
 		stamp("is thinking\n", philo);
@@ -63,35 +49,38 @@ void	*philo_routine(void *arg)
 	return (NULL);
 }
 
-void	start_philos(t_table *table)
+void	start_pari(t_table *table)
 {
 	int	i;
 
 	i = -1;
-	//pthread_mutex_lock(&table->sem);
-	if (table->num_of_philo % 2 == 0)
+	pthread_mutex_lock(&table->sem);
+	while (++i < table->num_of_philo)
 	{
-		//prima creare i thread pari e poi i dispari
-		pthread_mutex_lock(&table->sem);
-		while (++i < table->num_of_philo)
-		{
-			if (i % 2 == 0)
-				pthread_create(&(table->philos[i].tid), NULL, \
-						&philo_routine, (void *)&table->philos[i]);
-		}
-		i = -1;
-		table->creation_time = get_time();
-		pthread_mutex_unlock(&table->sem);
-		usleep(1000);
-		while (++i < table->num_of_philo)
-		{
-			if (i % 2 != 0)
-				pthread_create(&(table->philos[i].tid), NULL, \
-						&philo_routine, (void *)&table->philos[i]);
-		}
+		if (i % 2 == 0)
+			pthread_create(&(table->philos[i].tid), NULL, \
+					&philo_routine, (void *)&table->philos[i]);
 	}
+	i = -1;
+	usleep(1000);
+	table->creation_time = get_time();
+	pthread_mutex_unlock(&table->sem);
+	usleep(10000);
+	while (++i < table->num_of_philo)
+		if (i % 2 != 0)
+			pthread_create(&(table->philos[i].tid), NULL, \
+					&philo_routine, (void *)&table->philos[i]);
+}
+
+void	start_philos(t_table *table)
+{
+	int	i;
+
+	if (table->num_of_philo % 2 == 0)
+		start_pari(table);
 	else
 	{
+		i = -1;
 		pthread_mutex_lock(&table->sem);
 		while (++i < table->num_of_philo)
 		{
@@ -100,15 +89,13 @@ void	start_philos(t_table *table)
 						&philo_routine, (void *)&table->philos[i]);
 		}
 		i = -1;
+		usleep(1000);
 		table->creation_time = get_time();
 		pthread_mutex_unlock(&table->sem);
-		usleep(1000);
+		usleep(10000);
 		while (++i < table->num_of_philo)
-		{
 			if (i % 2 == 0)
 				pthread_create(&(table->philos[i].tid), NULL, \
 						&philo_routine, (void *)&table->philos[i]);
-		}
 	}
-	//pthread_mutex_unlock(&table->sem);
 }
