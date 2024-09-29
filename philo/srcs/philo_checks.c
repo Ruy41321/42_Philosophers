@@ -6,7 +6,7 @@
 /*   By: lpennisi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 11:51:26 by lpennisi          #+#    #+#             */
-/*   Updated: 2024/04/10 14:37:28 by lpennisi         ###   ########.fr       */
+/*   Updated: 2024/09/29 12:50:48 by lpennisi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	philo_is_dead(t_philo *philo)
 		return (0);
 	time = get_time() - philo->table->creation_time;
 	pthread_mutex_lock(&philo->table->sem);
-	if (time > philo->time_to_die)
+	if (time >= philo->time_to_die)
 	{
 		printf("%d %d died\n", time, philo->id);
 		philo->table->is_over = 1;
@@ -61,7 +61,7 @@ int	philo_is_full(t_philo *philo)
 	if (philo->table->meals_num != -1)
 	{
 		pthread_mutex_lock(&philo->table->sem);
-		if (philo->meals_num == 0)
+		if (philo->meals_num <= 0)
 		{
 			pthread_mutex_unlock(&philo->table->sem);
 			return (1);

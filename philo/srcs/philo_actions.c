@@ -6,7 +6,7 @@
 /*   By: lpennisi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/04 16:08:27 by lpennisi          #+#    #+#             */
-/*   Updated: 2024/04/10 14:37:24 by lpennisi         ###   ########.fr       */
+/*   Updated: 2024/09/29 10:00:17 by lpennisi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,18 @@ int	take_forks(t_philo *philo)
 
 void	eat(t_philo *philo)
 {
+	int	time;
+
 	if (take_forks(philo))
 		return ;
+	time = get_time() - philo->table->creation_time;
+	pthread_mutex_lock(&philo->table->sem);
+	if (time > philo->time_to_die)
+	{
+		pthread_mutex_unlock(&philo->table->sem);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->table->sem);
 	stamp("is eating\n", philo);
 	pthread_mutex_lock(&philo->table->sem);
 	philo->time_to_die = get_program_time(philo->table) \
@@ -74,5 +84,4 @@ void	philo_sleep(t_philo *philo)
 {
 	stamp("is sleeping\n", philo);
 	ft_sleep(philo->time_to_sleep, philo->table);
-	stamp("is thinking\n", philo);
 }

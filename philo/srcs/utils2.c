@@ -6,7 +6,7 @@
 /*   By: lpennisi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/02 18:18:09 by lpennisi          #+#    #+#             */
-/*   Updated: 2024/03/09 16:02:56 by lpennisi         ###   ########.fr       */
+/*   Updated: 2024/09/29 10:28:35 by lpennisi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ int	parse_arguments(t_table *table, char **argv)
 	table->time_to_eat = ft_atoi(argv[3]);
 	table->time_to_sleep = ft_atoi(argv[4]);
 	pthread_mutex_init(&table->sem, NULL);
-	table->creation_time = get_time();
 	table->is_over = 0;
 	return (set_philos(table));
 }
